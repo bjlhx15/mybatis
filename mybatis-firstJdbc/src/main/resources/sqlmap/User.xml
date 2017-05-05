@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace ：命名空间，用于隔离sql语句，后面会讲另一层非常重要的作用。 -->
+<!-- 注意：使用 mapper代理方式开发，namespace比较重要 -->
+<mapper namespace="test">
+	<!-- 在映射文件中配置很多sql语句 -->
+	<!-- 通过select执行数据库查询 -->
+	<!-- id：标识映射文件中的sql语句封装到 mappedStatement对象中，所以称为Statement的id -->
+	<!-- #{}表示一个占位符 -->
+	<!-- parameterType指定输入参数的类型 -->
+	<!-- #{id}参数名为id，如果入参是简单类型，参数名任意 -->
+	<!-- resultType 输出结果映射的java对象类型，select指定resultType记录映射的java对象 -->
+	<select id="findUserById" parameterType="int"
+		resultType="com.lhx.mybatis.po.User">
+		select * from User where
+		id=#{id}
+	</select>
+	<!-- 通过用户名查询用户 ,结果可能多条 -->
+	<select id="findUserByName" parameterType="java.lang.String"
+		resultType="com.lhx.mybatis.po.User">
+		select * from User where username like '%${value}%'
+	</select>
+	<!-- 添加用户 -->
+	<!-- 入参pojo对象，sql语句的参数是pojo的属性名及值，使用OGNL获取对象属性及值 -->
+	<insert id="insertUser" parameterType="com.lhx.mybatis.po.User">
+		insert into user(username,birthday,sex,address)
+		values(#{username},#{birthday},#{sex},#{address})
+	</insert>
+</mapper>
