@@ -1,4 +1,4 @@
-package com.lhx.mybatis.po;
+package com.lhx.mybatis.firstMybatis;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +11,9 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
-public class UserTest {
+import com.lhx.mybatis.po.User;
+
+public class TestMybatisUsing {
 
 	// 会话工厂
 	private SqlSessionFactory sqlSessionFactory;
