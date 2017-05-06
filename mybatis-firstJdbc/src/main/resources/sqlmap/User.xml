@@ -40,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</delete>
 	
 	<!-- 更新用户 -->
-    <update id="updateUser" parameterType="cn.itcast.mybatis.po.User">
+    <update id="updateUser" parameterType="com.lhx.mybatis.po.User">
        update user set username=#{username},birthday=#{birthday},sex=#{sex},address=#{address}
        where id=#{id}
     </update>
