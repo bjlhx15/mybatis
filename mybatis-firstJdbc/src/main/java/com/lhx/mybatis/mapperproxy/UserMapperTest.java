@@ -2,15 +2,15 @@ package com.lhx.mybatis.mapperproxy;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.Before;
-import org.junit.Test;
 
+import com.lhx.mybatis.po.QueryVo;
 import com.lhx.mybatis.po.User;
 
 import junit.framework.TestCase;
@@ -79,6 +79,7 @@ public class UserMapperTest extends TestCase {
 		session.close();
 
 	}
+
 	public void testFindUserByIdAndSex2() throws Exception {
 		// 获取session
 		SqlSession session = sqlSessionFactory.openSession();
@@ -90,5 +91,37 @@ public class UserMapperTest extends TestCase {
 		// 关闭session
 		session.close();
 
+	}
+
+	public void testFindUserByHashmap() throws Exception {
+		// 获取session
+		SqlSession session = sqlSessionFactory.openSession();
+		// 获限mapper接口实例
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+		// 构造查询条件Hashmap对象
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("id", 1);
+		map.put("username", "管理员");
+
+		// 传递Hashmap对象查询用户列表
+		List<User> list = userMapper.findUserByHashmap(map);
+		// 关闭session
+		session.close();
+	}
+
+	public void testFindUserListResultMap() throws Exception {
+		// 获取session
+		SqlSession session = sqlSessionFactory.openSession();
+		// 获限mapper接口实例
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+		QueryVo queryVo = new QueryVo();
+		User user = new User();
+		user.setUsername("张");
+		user.setSex("女");
+		queryVo.setUser(user);
+		// 传递Hashmap对象查询用户列表
+		List<User> list = userMapper.findUserListResultMap(queryVo);
+		// 关闭session
+		session.close();
 	}
 }

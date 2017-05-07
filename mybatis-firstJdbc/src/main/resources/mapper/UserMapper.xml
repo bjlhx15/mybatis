@@ -3,6 +3,10 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lhx.mybatis.mapperproxy.UserMapper">
+	<resultMap type="com.lhx.mybatis.po.User" id="userListMap">
+		<id column="id_" property="id"></id>
+		<result column="username_" property="username"></result>
+	</resultMap>
 	<!-- 根据id获取用户信息 -->
 	<select id="findUserById" parameterType="int"
 		resultType="com.lhx.mybatis.po.User">
@@ -30,5 +34,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="findUserByIdAndSex2" resultType="com.lhx.mybatis.po.User">
 		select * from user
 		where id = #{id} and sex = #{sex}
+	</select>
+
+	<!-- 传递hashmap综合查询用户信息 -->
+	<select id="findUserByHashmap" parameterType="hashmap"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user where id=#{id} and username like
+		'%${username}%'
+	</select>
+
+	<select id="findUserList" parameterType="com.lhx.mybatis.po.QueryVo"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user where #{user.username} and
+		sex=#{user.sex}
+	</select>
+
+
+
+	<select id="findUserListResultMap" parameterType="com.lhx.mybatis.po.QueryVo"
+		resultMap="userListMap">
+		select id id_,username username_ from user where
+		#{user.username} and
+		sex=#{user.sex}
 	</select>
 </mapper>

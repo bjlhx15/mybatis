@@ -1,9 +1,11 @@
 package com.lhx.mybatis.mapperproxy;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.lhx.mybatis.po.QueryVo;
 import com.lhx.mybatis.po.User;
 
 /**
@@ -22,4 +24,10 @@ public interface UserMapper {
 	public User findUserByIdAndSex(int id, int sex) throws Exception;
 
 	public User findUserByIdAndSex2(@Param("id") int id, @Param("sex") int sex) throws Exception;
+
+	public List<User> findUserByHashmap(HashMap<String, Object> map) throws Exception;
+
+	public List<User> findUserList(QueryVo queryVo) throws Exception;
+	
+	public List<User> findUserListResultMap(QueryVo queryVo) throws Exception;
 }
