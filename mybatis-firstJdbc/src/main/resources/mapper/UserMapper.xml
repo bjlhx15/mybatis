@@ -45,8 +45,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="findUserList" parameterType="com.lhx.mybatis.po.QueryVo"
 		resultType="com.lhx.mybatis.po.User">
-		select * from user where #{user.username} and
-		sex=#{user.sex}
+		select * from user
+		<where>
+			<if test="user!=null and user.username!=null and user.username!=''">
+				and username = #{user.username}
+			</if>
+			<if test="user!=null and user.sex!=null and user.sex!=''">
+				and sex=#{user.sex}
+			</if>
+			<if test="ids!=null and ids.size>0">
+				<foreach collection="ids" open=" and id in(" close=")" item="id"
+					separator=",">
+					#{id}
+				</foreach>
+			</if>
+		</where>
 	</select>
 
 
@@ -56,5 +69,51 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select id id_,username username_ from user where
 		#{user.username} and
 		sex=#{user.sex}
+	</select>
+
+	<select id="selectUserByList" parameterType="java.util.List"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user
+		<where>
+			<!-- 传递List，List中是pojo -->
+			<if test="list!=null">
+				<foreach collection="list" item="item" open="and id in("
+					separator="," close=")">
+					#{item.id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+
+	<!-- 传递数组综合查询用户信息 -->
+	<select id="selectUserByArrayPojo" parameterType="Object[]"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user
+		<where>
+			<!-- 传递数组 -->
+			<if test="array!=null">
+				<foreach collection="array" index="index" item="item" open="and id in("
+					separator="," close=")">
+					#{item.id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+
+	<!-- 传递数组综合查询用户信息 -->
+	<select id="selectUserByArray" parameterType="Object[]"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user
+		<where>
+			<!-- 传递数组 -->
+			<if test="array!=null">
+				<foreach collection="array" index="index" item="item" open="and id in("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
 	</select>
 </mapper>

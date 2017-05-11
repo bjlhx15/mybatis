@@ -30,4 +30,10 @@ public interface UserMapper {
 	public List<User> findUserList(QueryVo queryVo) throws Exception;
 	
 	public List<User> findUserListResultMap(QueryVo queryVo) throws Exception;
+	
+	public List<User> selectUserByList(List<User> userlist) throws Exception;
+	
+	public List<User> selectUserByArrayPojo(Object[] userlist) throws Exception;
+	
+	public List<User> selectUserByArray(Object[] userlist) throws Exception;
 }

@@ -1,6 +1,7 @@
 package com.lhx.mybatis.mapperproxy;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +122,75 @@ public class UserMapperTest extends TestCase {
 		queryVo.setUser(user);
 		// 传递Hashmap对象查询用户列表
 		List<User> list = userMapper.findUserListResultMap(queryVo);
+		// 关闭session
+		session.close();
+	}
+
+	public void testFindByQueryVo() throws Exception {
+		// 获取session
+		SqlSession session = sqlSessionFactory.openSession();
+		// 获限mapper接口实例
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+		QueryVo queryVo = new QueryVo();
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(1);
+		queryVo.setIds(ids);
+		// 传递Hashmap对象查询用户列表
+		List<User> list = userMapper.findUserList(queryVo);
+		// 关闭session
+		session.close();
+	}
+
+	public void testselectUserByList() throws Exception {
+		// 获取session
+		SqlSession session = sqlSessionFactory.openSession();
+		// 获限mapper接口实例
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+		// 构造查询条件List
+		List<User> userlist = new ArrayList<User>();
+		User user = new User();
+		user.setId(1);
+		userlist.add(user);
+		user = new User();
+		user.setId(2);
+		userlist.add(user);
+		// 传递userlist列表查询用户列表
+		List<User> list = userMapper.selectUserByList(userlist);
+		System.out.println(list.size() + "");
+		// 关闭session
+		session.close();
+	}
+
+	public void testselectUserByArrayPojo() throws Exception {
+		// 获取session
+		SqlSession session = sqlSessionFactory.openSession();
+		// 获限mapper接口实例
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+		// 构造查询条件List
+		Object[] userlist = new Object[2];
+		User user = new User();
+		user.setId(1);
+		userlist[0] = user;
+		user = new User();
+		user.setId(2);
+		userlist[1] = user;
+		// 传递user对象查询用户列表
+		List<User> list = userMapper.selectUserByArrayPojo(userlist);
+		// 关闭session
+		session.close();
+	}
+
+	public void testselectUserByArray() throws Exception {
+		// 获取session
+		SqlSession session = sqlSessionFactory.openSession();
+		// 获限mapper接口实例
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+		// 构造查询条件List
+		Object[] userlist = new Object[2];
+		userlist[0] = "1";
+		userlist[1] = "2";
+		// 传递user对象查询用户列表
+		List<User> list = userMapper.selectUserByArray(userlist);
 		// 关闭session
 		session.close();
 	}

@@ -1,10 +1,20 @@
 package com.lhx.mybatis.po;
 
+import java.util.List;
+
 public class QueryVo {
 	private User user;
 	// 自定义用户扩展类
 	private UserCustom userCustom;
 	private String ordercode;
+	private List<Integer> ids;
+	
+	public List<Integer> getIds() {
+		return ids;
+	}
+	public void setIds(List<Integer> ids) {
+		this.ids = ids;
+	}
 	public User getUser() {
 		return user;
 	}
