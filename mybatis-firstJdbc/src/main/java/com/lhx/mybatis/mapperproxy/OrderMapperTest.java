@@ -10,6 +10,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import com.lhx.mybatis.po.Order;
 import com.lhx.mybatis.po.OrdersCustom;
+import com.lhx.mybatis.po.User;
 
 import junit.framework.TestCase;
 
@@ -73,5 +74,7 @@ public class OrderMapperTest extends TestCase {
 		// 关闭session
 		session.close();
 	}
+	
+	
 
 }

@@ -1,10 +1,22 @@
 package com.lhx.mybatis.po;
 
+import java.util.List;
+
 public class OrderDetail {
 	private Integer id;
 	private Integer ordersId;
 	private Integer itemsId;
 	private Integer itemsNum;
+	
+	private Item item;
+	
+	
+	public Item getItem() {
+		return item;
+	}
+	public void setItem(Item item) {
+		this.item = item;
+	}
 	public Integer getId() {
 		return id;
 	}

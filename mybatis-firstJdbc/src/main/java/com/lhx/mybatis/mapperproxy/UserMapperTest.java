@@ -11,6 +11,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import com.lhx.mybatis.po.Order;
 import com.lhx.mybatis.po.QueryVo;
 import com.lhx.mybatis.po.User;
 
@@ -194,4 +195,17 @@ public class UserMapperTest extends TestCase {
 		// 关闭session
 		session.close();
 	}
+
+	public void testFindMulti() throws Exception {
+		// 获取session
+		SqlSession session = sqlSessionFactory.openSession();
+		// 获限mapper接口实例
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+		// 传递user对象查询用户列表
+		List<User> list = userMapper.findMutli();
+		// 关闭session
+		session.close();
+
+	}
+
 }

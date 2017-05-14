@@ -1,6 +1,7 @@
 package com.lhx.mybatis.po;
 
 import java.util.Date;
+import java.util.List;
 
 public class User {
 	// 属性名和数据库对应
@@ -9,6 +10,17 @@ public class User {
 	private String sex;// 性别
 	private Date birthday;// 生日
 	private String address;// 地址
+	
+	private List<Order> ordersList;
+	
+
+
+	public List<Order> getOrdersList() {
+		return ordersList;
+	}
+	public void setOrdersList(List<Order> ordersList) {
+		this.ordersList = ordersList;
+	}
 	public int getId() {
 		return id;
 	}
@@ -42,7 +54,15 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", sex=" + sex + ", birthday=" + birthday + ", address="
-				+ address + "]";
+				+ address + ", ordersList=" + ordersList + "]";
 	}
+
+
+	
+
+
+
+
+
 
 }

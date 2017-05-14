@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.lhx.mybatis.po.Order;
 import com.lhx.mybatis.po.QueryVo;
 import com.lhx.mybatis.po.User;
 
@@ -36,4 +37,6 @@ public interface UserMapper {
 	public List<User> selectUserByArrayPojo(Object[] userlist) throws Exception;
 	
 	public List<User> selectUserByArray(Object[] userlist) throws Exception;
+
+	List<User> findMutli()throws Exception;
 }

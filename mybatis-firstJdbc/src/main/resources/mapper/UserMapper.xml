@@ -7,6 +7,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<id column="id_" property="id"></id>
 		<result column="username_" property="username"></result>
 	</resultMap>
+	<!-- 查询用户及购买的商品 -->
+	<resultMap type="com.lhx.mybatis.po.User" id="UserAndItemsResultMap">
+		<!-- 用户信息 -->
+		<id column="user_id" property="id" />
+		<result column="username" property="username" />
+		<result column="sex" property="sex" />
+		<result column="address" property="address" />
+		<!-- 订单信息 一个用户对应多个订单，使用collection映射 -->
+		<collection property="ordersList" ofType="com.lhx.mybatis.po.Order">
+			<id column="id" property="id" />
+			<result column="user_id" property="user_id" />
+			<result column="number" property="number" />
+			<result column="createtime" property="createtime" />
+			<result column="note" property="note" />
+			<!-- 订单明细 一个订单包括 多个明细 -->
+			<collection property="orderDetails" ofType="com.lhx.mybatis.po.OrderDetail">
+				<id column="orderdetail_id" property="id" />
+				<result column="items_id" property="itemsId" />
+				<result column="items_num" property="itemsNum" />
+				<result column="orders_id" property="ordersId" />
+				<!-- 商品信息 一个订单明细对应一个商品 -->
+				<association property="item" javaType="com.lhx.mybatis.po.Item">
+					<id column="items_id" property="id" />
+					<result column="items_name" property="name" />
+					<result column="items_detail" property="detail" />
+					<result column="items_price" property="price" />
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+
 	<!-- 根据id获取用户信息 -->
 	<select id="findUserById" parameterType="int"
 		resultType="com.lhx.mybatis.po.User">
@@ -116,4 +147,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			</if>
 		</where>
 	</select>
+	<select id="findMutli" resultMap="UserAndItemsResultMap">
+		SELECT
+		orders.*,
+		USER.username,
+		USER.address,
+		orderdetail.id orderdetail_id,
+		orderdetail.items_id,
+		orderdetail.items_num,
+		items.name items_name,
+		items.detail items_detail
+		FROM
+		orders,
+		USER,
+		orderdetail,
+		items
+		WHERE
+		orders.user_id = USER .id
+		AND
+		orders.id = orderdetail.orders_id
+		AND orderdetail.items_id = items.id
+	</select>
+
 </mapper>

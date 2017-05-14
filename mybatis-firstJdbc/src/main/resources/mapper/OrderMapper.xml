@@ -43,6 +43,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<result property="itemsNum" column="items_num" />
 		</collection>
 	</resultMap>
+	
+	
 	<!-- 查询所有订单信息 -->
 	<select id="findOrdersList" resultType="com.lhx.mybatis.po.OrdersCustom">
 		SELECT
@@ -79,4 +81,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		WHERE orders.user_id = user.id
 		AND orders.id = orderdetail.orders_id
 	</select>
+	
+	
 </mapper>
