@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lhx.mybatis.mapperproxy.OrderMapper">
+	<!-- 订单信息resultmap -->
+	<resultMap type="com.lhx.mybatis.po.Order" id="userordermap">
+		<!-- 这里的id，是mybatis在进行一对一查询时将user字段映射为user对象时要使用，必须写 -->
+		<id property="id" column="id" />
+		<result property="user_id" column="user_id" />
+		<result property="number" column="number" />
+		<association property="user" javaType="com.lhx.mybatis.po.User">
+			<!-- 这里的id为user的id，如果写上表示给user的id属性赋值 -->
+			<id property="id" column="user_id" />
+			<result property="username" column="username" />
+			<result property="address" column="address" />
+		</association>
+	</resultMap>
+	<!-- 订单信息resultmap -->
+	<resultMap type="com.lhx.mybatis.po.Order" id="userorderdetailmap">
+		<!-- 这里的id，是mybatis在进行一对一查询时将user字段映射为user对象时要使用，必须写 -->
+		<id property="id" column="id" />
+		<result property="user_id" column="user_id" />
+		<result property="number" column="number" />
+		<association property="user" javaType="com.lhx.mybatis.po.User">
+			<!-- 这里的id为user的id，如果写上表示给user的id属性赋值 -->
+			<id property="id" column="user_id" />
+			<result property="username" column="username" />
+			<result property="address" column="address" />
+		</association>
+		<collection property="orderDetails" ofType="com.lhx.mybatis.po.OrderDetail">
+			<id property="id" column="orderdetail_id" />
+			<result property="itemsId" column="items_id" />
+			<result property="itemsNum" column="items_num" />
+		</collection>
+	</resultMap>
+	<!-- 继承 -->
+	<resultMap extends="userordermap" type="com.lhx.mybatis.po.Order"
+		id="userorderdetailmap2">
+		<collection property="orderDetails" ofType="com.lhx.mybatis.po.OrderDetail">
+			<id property="id" column="orderdetail_id" />
+			<result property="itemsId" column="items_id" />
+			<result property="itemsNum" column="items_num" />
+		</collection>
+	</resultMap>
+	
+	
+	<!-- 查询所有订单信息 -->
+	<select id="findOrdersList" resultType="com.lhx.mybatis.po.OrdersCustom">
+		SELECT
+		orders.*,
+		user.username,
+		user.address
+		FROM
+		orders, user
+		WHERE orders.user_id =
+		user.id
+	</select>
+
+	<select id="findOrdersListResultMap" resultMap="userordermap">
+		SELECT
+		orders.*,
+		user.username,
+		user.address
+		FROM
+		orders, user
+		WHERE orders.user_id =
+		user.id
+	</select>
+
+
+	<select id="findOrdersDetailList" resultMap="userorderdetailmap">
+		SELECT
+		orders.*,
+		user.username,
+		user.address,
+		orderdetail.id orderdetail_id,
+		orderdetail.items_id,
+		orderdetail.items_num
+		FROM orders,user,orderdetail
+		WHERE orders.user_id = user.id
+		AND orders.id = orderdetail.orders_id
+	</select>
+	
+	
+</mapper>

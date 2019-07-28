@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd
+">
+
+    <!-- 连接池基本 父类 -->
+    <bean id="abstractDataSource" abstract="true" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+        <!--        <property name="filters" value="config"/>-->
+        <!--        <property name="connectionProperties" value="config.decrypt=true"/>-->
+    </bean>
+    <!--读1连接池-->
+    <bean id="dataSourceRead1" parent="abstractDataSource">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="jdbc:mysql://127.0.0.1:3358/test?useSSL=false&amp;characterEncoding=utf8"/>
+        <property name="username" value="read"/>
+        <property name="password" value="read"/>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="10"/>
+        <property name="minIdle" value="10"/>
+        <property name="maxActive" value="10"/>
+    </bean>
+
+    <!--读2连接池-->
+    <bean id="dataSourceRead2" parent="abstractDataSource">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="jdbc:mysql://127.0.0.1:3358/test?useSSL=false&amp;characterEncoding=utf8"/>
+        <property name="username" value="read"/>
+        <property name="password" value="read"/>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="10"/>
+        <property name="minIdle" value="10"/>
+        <property name="maxActive" value="10"/>
+    </bean>
+
+    <!--写连接池-->
+    <bean id="dataSourceWrite" parent="abstractDataSource">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="jdbc:mysql://127.0.0.1:3358/test?useSSL=false&amp;characterEncoding=utf8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="10"/>
+        <property name="minIdle" value="10"/>
+        <property name="maxActive" value="10"/>
+    </bean>
+
+    <bean id="dataSource" class="com.github.bjlhx15.mybatis.readwrite.split.datasource.DynamicDataSource">
+        <property name="writeDataSource" ref="dataSourceWrite"/>
+        <property name="readDataSources">
+            <list>
+                <ref bean="dataSourceRead1"/>
+                <ref bean="dataSourceRead2"/>
+            </list>
+        </property>
+        <!--轮询方式-->
+        <property name="readDataSourcePollPattern" value="1"/>
+        <!--        什么都没有的注释 使用的数据源-->
+        <property name="defaultTargetDataSource" ref="dataSourceWrite"/>
+    </bean>
+
+    <!--    事务-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 针对myBatis的配置项 -->
+    <!-- 配置sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 实例化sqlSessionFactory时需要使用上述配置好的数据源以及SQL映射文件 -->
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath:mapper/auto/**/*.xml"/>
+        <!--    mybatis的全局配置文件 如没有特需 可以不配置    -->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <!-- 配置分页插件 -->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <value>
+                            helperDialect=mysql
+                            reasonable=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!--   配置扫描器  必须添加 mapper 得扫描 因为mybatis 生成的mapper没有注解-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.github.bjlhx15.mybatis.readwrite.split.repository"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <!-- 配置数据库注解aop -->
+    <bean id="dynamicDataSourceAspect"
+          class="com.github.bjlhx15.mybatis.readwrite.split.datasource.DynamicDataSourceAspect"/>
+    <aop:config>
+        <aop:aspect id="c" ref="dynamicDataSourceAspect">
+            <aop:pointcut id="tx"
+                          expression="execution(* com.github.bjlhx15.mybatis.readwrite.split.repository.auto..*.*(..))"/>
+            <aop:before pointcut-ref="tx" method="before"/>
+            <aop:after pointcut-ref="tx" method="after"/>
+        </aop:aspect>
+    </aop:config>
+    <!-- 配置数据库注解aop -->
+</beans>

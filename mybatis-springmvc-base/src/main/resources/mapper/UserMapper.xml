@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lhx.mybatis.mapperproxy.UserMapper">
+	<resultMap type="com.lhx.mybatis.po.User" id="userListMap">
+		<id column="id_" property="id"></id>
+		<result column="username_" property="username"></result>
+	</resultMap>
+	<!-- 查询用户及购买的商品 -->
+	<resultMap type="com.lhx.mybatis.po.User" id="UserAndItemsResultMap">
+		<!-- 用户信息 -->
+		<id column="user_id" property="id" />
+		<result column="username" property="username" />
+		<result column="sex" property="sex" />
+		<result column="address" property="address" />
+		<!-- 订单信息 一个用户对应多个订单，使用collection映射 -->
+		<collection property="ordersList" ofType="com.lhx.mybatis.po.Order">
+			<id column="id" property="id" />
+			<result column="user_id" property="user_id" />
+			<result column="number" property="number" />
+			<result column="createtime" property="createtime" />
+			<result column="note" property="note" />
+			<!-- 订单明细 一个订单包括 多个明细 -->
+			<collection property="orderDetails" ofType="com.lhx.mybatis.po.OrderDetail">
+				<id column="orderdetail_id" property="id" />
+				<result column="items_id" property="itemsId" />
+				<result column="items_num" property="itemsNum" />
+				<result column="orders_id" property="ordersId" />
+				<!-- 商品信息 一个订单明细对应一个商品 -->
+				<association property="item" javaType="com.lhx.mybatis.po.Item">
+					<id column="items_id" property="id" />
+					<result column="items_name" property="name" />
+					<result column="items_detail" property="detail" />
+					<result column="items_price" property="price" />
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+
+	<!-- 根据id获取用户信息 -->
+	<select id="findUserById" parameterType="int"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user where id = #{id}
+	</select>
+	<!-- 自定义条件查询用户列表 -->
+	<select id="findUserByUsername" parameterType="java.lang.String"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user where username like '%${value}%'
+	</select>
+	<!-- 添加用户 -->
+	<insert id="insertUser" parameterType="com.lhx.mybatis.po.User">
+		<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+			select
+			LAST_INSERT_ID()
+		</selectKey>
+		insert into user(username,birthday,sex,address)
+		values(#{username},#{birthday},#{sex},#{address})
+	</insert>
+	<!-- 多个参数，不写入参类型 -->
+	<select id="findUserByIdAndSex" resultType="com.lhx.mybatis.po.User">
+		select * from user
+		where id = #{0} and sex = #{1}
+	</select>
+	<select id="findUserByIdAndSex2" resultType="com.lhx.mybatis.po.User">
+		select * from user
+		where id = #{id} and sex = #{sex}
+	</select>
+
+	<!-- 传递hashmap综合查询用户信息 -->
+	<select id="findUserByHashmap" parameterType="hashmap"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user where id=#{id} and username like
+		'%${username}%'
+	</select>
+
+	<select id="findUserList" parameterType="com.lhx.mybatis.po.QueryVo"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user
+		<where>
+			<if test="user!=null and user.username!=null and user.username!=''">
+				and username = #{user.username}
+			</if>
+			<if test="user!=null and user.sex!=null and user.sex!=''">
+				and sex=#{user.sex}
+			</if>
+			<if test="ids!=null and ids.size>0">
+				<foreach collection="ids" open=" and id in(" close=")" item="id"
+					separator=",">
+					#{id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+
+
+	<select id="findUserListResultMap" parameterType="com.lhx.mybatis.po.QueryVo"
+		resultMap="userListMap">
+		select id id_,username username_ from user where
+		#{user.username} and
+		sex=#{user.sex}
+	</select>
+
+	<select id="selectUserByList" parameterType="java.util.List"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user
+		<where>
+			<!-- 传递List，List中是pojo -->
+			<if test="list!=null">
+				<foreach collection="list" item="item" open="and id in("
+					separator="," close=")">
+					#{item.id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+
+	<!-- 传递数组综合查询用户信息 -->
+	<select id="selectUserByArrayPojo" parameterType="Object[]"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user
+		<where>
+			<!-- 传递数组 -->
+			<if test="array!=null">
+				<foreach collection="array" index="index" item="item" open="and id in("
+					separator="," close=")">
+					#{item.id}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+
+	<!-- 传递数组综合查询用户信息 -->
+	<select id="selectUserByArray" parameterType="Object[]"
+		resultType="com.lhx.mybatis.po.User">
+		select * from user
+		<where>
+			<!-- 传递数组 -->
+			<if test="array!=null">
+				<foreach collection="array" index="index" item="item" open="and id in("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	<select id="findMutli" resultMap="UserAndItemsResultMap">
+		SELECT
+		orders.*,
+		USER.username,
+		USER.address,
+		orderdetail.id orderdetail_id,
+		orderdetail.items_id,
+		orderdetail.items_num,
+		items.name items_name,
+		items.detail items_detail
+		FROM
+		orders,
+		USER,
+		orderdetail,
+		items
+		WHERE
+		orders.user_id = USER .id
+		AND
+		orders.id = orderdetail.orders_id
+		AND orderdetail.items_id = items.id
+	</select>
+
+</mapper>
