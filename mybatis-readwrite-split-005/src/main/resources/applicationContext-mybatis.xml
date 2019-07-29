@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd
+">
+
+    <!-- 连接池基本 父类 -->
+    <bean id="abstractDataSource" abstract="true" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+        <!--        <property name="filters" value="config"/>-->
+        <!--        <property name="connectionProperties" value="config.decrypt=true"/>-->
+
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="10"/>
+        <property name="minIdle" value="10"/>
+        <property name="maxActive" value="10"/>
+    </bean>
+    <!--写连接池-->
+    <bean id="writeDataSource" parent="abstractDataSource">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="jdbc:mysql://127.0.0.1:3358/test?useSSL=false&amp;characterEncoding=utf8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
+    </bean>
+
+    <!--读连接池-->
+    <bean id="readDataSource" parent="abstractDataSource">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="jdbc:mysql://127.0.0.1:3358/test?useSSL=false&amp;characterEncoding=utf8"/>
+        <property name="username" value="read"/>
+        <property name="password" value="read"/>
+    </bean>
+
+    <bean id="shardingRoutingDataSource"
+          class="com.github.bjlhx15.mybatis.readwrite.split.datasource.ShardingRoutingDataSource">
+        <property name="targetDataSources">
+            <map>
+                <entry key="write" value-ref="writeDataSource"/>
+                <entry key="read" value-ref="readDataSource"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="readDataSource"></property>
+    </bean>
+
+    <bean id="lazyDataSource" class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+        <property name="targetDataSource" ref="shardingRoutingDataSource"></property>
+    </bean>
+
+<!--    <bean id="mybatisSqlInterceptor" class="com.github.bjlhx15.mybatis.readwrite.split.datasource.MybatisSqlInterceptor"></bean>-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 实例化sqlSessionFactory时需要使用上述配置好的数据源以及SQL映射文件 -->
+        <property name="dataSource" ref="lazyDataSource"/>
+        <property name="mapperLocations" value="classpath:mapper/auto/**/*.xml"/>
+        <!--    mybatis的全局配置文件 如没有特需 可以不配置    -->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <!-- 配置分页插件 -->
+<!--        <property name="plugins">-->
+<!--            <array>-->
+<!--&lt;!&ndash;                <ref bean="mybatisSqlInterceptor"></ref>&ndash;&gt;-->
+<!--                -->
+<!--&lt;!&ndash;                <bean class="com.github.pagehelper.PageInterceptor">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <property name="properties">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <value>&ndash;&gt;-->
+<!--&lt;!&ndash;                            helperDialect=mysql&ndash;&gt;-->
+<!--&lt;!&ndash;                            reasonable=true&ndash;&gt;-->
+<!--&lt;!&ndash;                        </value>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </property>&ndash;&gt;-->
+<!--&lt;!&ndash;                </bean>&ndash;&gt;-->
+<!--            </array>-->
+<!--        </property>-->
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="lazyDataSource"></property>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+    <!--    必须添加 mapper 得扫描 因为mybatis 生成的mapper没有注解-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.github.bjlhx15.mybatis.readwrite.split.repository"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+    <bean id="userShardingDataSourceRule" class="com.github.bjlhx15.mybatis.readwrite.split.datasource.UserShardingDataSourceRule">
+        <property name="shardingTableName" value="accountbalance"></property>
+    </bean>
+
+</beans>
