@@ -15,6 +15,10 @@
 		<module>mybatis-readwrite-split-002-aop</module>
 		<module>mybatis-readwrite-split-003</module>
 		<module>mybatis-readwrite-split-004</module>
+		<module>mybatis-readwrite-split-005</module>
+		<module>mybatis-interceptor-001</module>
+		<module>mybatis-interceptor-002</module>
+		<module>mybatis-interceptor-003</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

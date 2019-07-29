@@ -40,12 +40,11 @@ public abstract class AbstractDynamicDataSourceProxy extends AbstractDataSource 
     private DataSourceLookup dataSourceLookup = new JndiDataSourceLookup();
 
     @Override
-    public ConnectionProxy getConnection() throws SQLException {
-        ConnectionProxy connection = (ConnectionProxy) Proxy.newProxyInstance(
-                ConnectionProxy.class.getClassLoader(),
-                new Class[]{ConnectionProxy.class},
+    public Connection getConnection() throws SQLException {
+        Connection connection = (Connection) Proxy.newProxyInstance(
+                com.github.bjlhx15.mybatis.readwrite.split.datasource.ConnectionProxy.class.getClassLoader(),
+                new Class[]{com.github.bjlhx15.mybatis.readwrite.split.datasource.ConnectionProxy.class},
                 new RWConnectionInvocationHandler());
-        System.out.println(connection.getClass().getName());
         return connection;
     }
 
@@ -53,8 +52,8 @@ public abstract class AbstractDynamicDataSourceProxy extends AbstractDataSource 
     public Connection getConnection(String username, String password)
             throws SQLException {
         return (Connection) Proxy.newProxyInstance(
-                ConnectionProxy.class.getClassLoader(),
-                new Class[] {ConnectionProxy.class},
+                com.github.bjlhx15.mybatis.readwrite.split.datasource.ConnectionProxy.class.getClassLoader(),
+                new Class[] {com.github.bjlhx15.mybatis.readwrite.split.datasource.ConnectionProxy.class},
                 new RWConnectionInvocationHandler(username,password));
     }
 

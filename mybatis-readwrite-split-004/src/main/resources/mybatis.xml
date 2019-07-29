@@ -16,7 +16,9 @@
 	</settings>
 	<plugins>
 			<!-- 拦截器配置 -->
-			<plugin interceptor="com.github.bjlhx15.mybatis.readwrite.split.datasource.DynamicPlugin" />
+		<plugin interceptor="com.github.bjlhx15.mybatis.readwrite.split.datasource.DynamicPlugin" />
+		<plugin interceptor="com.github.bjlhx15.mybatis.readwrite.split.datasource.Test1Interceptor" />
+		<plugin interceptor="com.github.bjlhx15.mybatis.readwrite.split.datasource.Test2Interceptor" />
 		</plugins>
 
 </configuration>

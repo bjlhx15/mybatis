@@ -20,19 +20,20 @@
         <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
         <property name="poolPreparedStatements" value="true"/>
         <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
-<!--        <property name="filters" value="config"/>-->
-<!--        <property name="connectionProperties" value="config.decrypt=true"/>-->
-    </bean>
-    <!--读写连接池-->
-    <bean id="wrDataSource" parent="abstractDataSource">
-        <!-- 基本属性 url、user、password -->
-        <property name="url" value="jdbc:mysql://192.168.139.217:3358/test"/>
-        <property name="username" value="root"/>
-        <property name="password" value="trace@root"/>
+        <!--        <property name="filters" value="config"/>-->
+        <!--        <property name="connectionProperties" value="config.decrypt=true"/>-->
+
         <!-- 配置初始化大小、最小、最大 -->
         <property name="initialSize" value="10"/>
         <property name="minIdle" value="10"/>
         <property name="maxActive" value="10"/>
+    </bean>
+    <!--读写连接池-->
+    <bean id="wrDataSource" parent="abstractDataSource">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="jdbc:mysql://127.0.0.1:3358/test?useSSL=false&amp;characterEncoding=utf8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
     </bean>
 
     <bean id="wrSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

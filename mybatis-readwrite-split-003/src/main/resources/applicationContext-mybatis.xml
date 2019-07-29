@@ -68,13 +68,13 @@
         <property name="readDataSourcePollPattern" value="1"/>
     </bean>
 
-    <!--    事务-->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <!--    事务-->
+    <tx:annotation-driven  transaction-manager="transactionManager"/>
     <!-- 针对myBatis的配置项 -->
     <!-- 配置sqlSessionFactory -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

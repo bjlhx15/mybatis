@@ -1,7 +1,6 @@
 package com.github.bjlhx15.mybatis.readwrite.split.datasource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
