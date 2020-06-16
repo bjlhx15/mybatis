@@ -7,8 +7,8 @@
         <!--数据库连接的信息：驱动类、连接地址、用户名、密码 -->
         <!--数据库连接的信息：驱动类、连接地址、用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.139.217:3358/test" userId="root"
-                        password="trace@root">
+                        connectionURL="jdbc:mysql://127.0.0.1:3358/test" userId="root"
+                        password="123456">
         </jdbcConnection>
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/>
